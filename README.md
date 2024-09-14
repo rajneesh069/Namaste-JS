@@ -223,7 +223,7 @@ Same happens with b() and then when the program is finished executing the GEC is
 
 ![Example for the Global Scope and stuff](windowAndThisKeyword/image.png)
 
-1. A global window object is created with a lot of properties inside along with the ones that are defined in the global
+1. Even in an empty JS file, a global window object is created with a lot of properties inside along with the ones that are defined in the global
    scope.
    ![window object](windowAndThisKeyword/Window-Object.png)
 2. What is global scope?
@@ -234,3 +234,16 @@ Same happens with b() and then when the program is finished executing the GEC is
 3. `This` keyword is intialized with the global window object and points to it.
 4. Obviously, in an empty JS file there's just the Memory Creation Phase and GEC is popped off in the Code Execution
    Phase as there's no code to run!
+
+## Undefined vs Not Defined
+
+![Code](undefinedVsNotDefined/image.png)
+
+- Undefined: A placeholder until a variable is assigned some value, if its not assigned any value throughout the program it will remain undefined.
+- Not Defined: The variable hasn't even been declared in the file hence doesn't exist in the Memory Space itself!
+- Weak/Loose Typing: The types of a variable could be changed as JS doesn't associate a variable to any kind of types.
+- One should avoid assigning undefined to the variables in a program as the keyword is used as more of a placeholder.
+
+![Not Defined](undefinedVsNotDefined/example.png)
+
+As we can see the program would terminate if a variable which hasn't even been declared is encountered.
