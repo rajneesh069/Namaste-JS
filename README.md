@@ -247,3 +247,27 @@ Same happens with b() and then when the program is finished executing the GEC is
 ![Not Defined](undefinedVsNotDefined/example.png)
 
 As we can see the program would terminate if a variable which hasn't even been declared is encountered.
+
+## Scope, Scope Chain and Lexical Environment
+
+![Example](ScopeChainAndLexicalEnvironment/image.png)
+
+- Scope: The extent till which a variable is accessible. It depends on the context as well.
+
+- Lexical: relating to
+
+  So when we say lexical environment, we mean the scope around a function, like in case of c it's a, in case of a it's the global scope and in case of global it's null.
+
+- Now, the scope chain is nothing but a derivation from the following concept:
+
+  - Whenever an EC is created, it has the reference to it's local scope, i.e., to the variables and functions defined inside it and the reference of parent lexical environment.
+
+  - In case of x, when `console.log(x)` is executed inside the function c, then it firstly searches inside the local scope, then in the parent lexical environment it has access to, i.e., a and then goes back to the parent lexical environment of a(as a has accesss to its parent same as c) which is global scope in this case hence printing 20.
+
+  - Although, in case of `console.log(b)` at line 11, it doesn't find the variable declaration in its scope which is global and there's no parent to global scope so it prints an error which is `b is not defined`.
+
+  - In the call stack, we can easily trace back the parent lexical environment as we traverse from top to the bottom of the stack.
+
+  - Lexical environment = Local Scope + Reference to the lexical parent's scope/lexical environment
+
+And this is how a scope chain is formed which traces back till the Global Context.
