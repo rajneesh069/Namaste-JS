@@ -218,3 +218,19 @@ Phase 2: Code Execution
         |GEC|
 
 Same happens with b() and then when the program is finished executing the GEC is popped off the stack and the GEC is deleted.
+
+## [Global Scope, This Keyword and Window Object](windowAndThisKeyword/index.js)
+
+![Example for the Global Scope and stuff](windowAndThisKeyword/image.png)
+
+1. A global window object is created with a lot of properties inside along with the ones that are defined in the global
+   scope.
+   ![window object](windowAndThisKeyword/Window-Object.png)
+2. What is global scope?
+
+   Ans. If a function/variable is defined outside any function's scope it is considered to be global and is attached
+   to the window object.
+
+3. `This` keyword is intialized with the global window object and points to it.
+4. Obviously, in an empty JS file there's just the Memory Creation Phase and GEC is popped off in the Code Execution
+   Phase as there's no code to run!
