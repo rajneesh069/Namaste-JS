@@ -271,3 +271,36 @@ As we can see the program would terminate if a variable which hasn't even been d
   - Lexical environment = Local Scope + Reference to the lexical parent's scope/lexical environment
 
 And this is how a scope chain is formed which traces back till the Global Context.
+
+## [let and const in JS: They behave like variable declarations should.](hoistingInJS/index.js)
+
+- From now on, never use 'var'.
+
+- They do `block scoped variable declaration`.
+
+- These `cannot be accessed before initialization`, it'll become clear later.
+
+- They `aren't attached to the window/global object` unlike variables declared with var.
+
+- `Values of const variables can't be changed, they need to be declared and initialized at the same time. It gives out Syntax Error if we don't initialize it.`
+
+- `They cannot be redeclared. It's a Syntax Error and the whole file won't even execute.`
+
+- `Are they hoisted? Yes, they are!`
+
+### Hoisting of let and const variables
+
+![Example](letAndConstInJS/hoistingAndDeclarationExample.png)
+
+1. During the memory creation phase these declarations exist in what's called a `temporal dead zone`, it could be `found under Script scope` if checked in the browser.
+
+2. During the time between the execution of code and them being actually assigned a value they exist in the temporal dead zone with the placeholder undefined but aren't accessible yet.
+
+3. Only once they are `assigned a value during the code execution phase`, which could be undefined for let variables if the let variable wasn't assigned anything explicitly in the code, `they become accessible`.
+
+4. If we `try to access them before hand we get the Reference Error`, i.e., `they cannot be accessed before initialization`. Program stops executing further ofc.
+
+- Syntax Errors aren't tolerated and the whole JS file won't even execute.
+- In case of TypeError or Reference Error, the file will run till we get the error and then the execution will stop.
+
+- Order of usage: const &rarr; let &rarr; var(never use this)
