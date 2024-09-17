@@ -371,3 +371,30 @@ console.log(b); // gives Error that b is not defined
 ![Allowed Shadowing](blockScopeAndShadowing/AllowedShadowing.png)
 
 ![Lexical Scope](blockScopeAndShadowing/LexicalScope.png)
+
+## Closures: Bundle of Lexical Scope of a function + itself
+
+- When a function is returned from another function `it rememebers the enclosed(lexical) scope` along with the function which is being returned. So basically a closure is returned, instead of just the function code.
+
+- You can think of it like this: When you call that inner function, you just simply go to that actual place of declaration and execute the function as if it was called from it's place of declaration only.
+
+- `Closures remember the scope they were created in, which allows access to variables even after the outer function has returned.`
+  
+![Closures](closures/closures.png)
+
+### Some nitty-gritties about closures
+- When the function is returned, it remembers the lexical scope as well as it takes care of the references of the variables in Memory and they aren't garbage collected, they are retained, hence a became 100 in the following example.
+
+  ![Nitty Gritty 1](closures/nitty1.png)
+
+
+- If we have one level deeper nesting, then also it gives us the variable's value, no need to worry, we have seen it in the example of x,y and z functions above.
+
+### Some use cases of Closures
+1. Module Design Pattern
+2. Currying in JS
+3. Memoize
+4. Functions like once
+5. Maintaining state in the `async` world
+6. Iterators
+7. Set Timeouts and many more...!
