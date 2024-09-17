@@ -398,3 +398,8 @@ console.log(b); // gives Error that b is not defined
 5. Maintaining state in the `async` world
 6. Iterators
 7. Set Timeouts and many more...!
+
+### SetTimeout and Closures
+![1](setTimeout+Closures/image.png)
+
+![2](setTimeout+Closures/image2.png)
