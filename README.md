@@ -301,6 +301,73 @@ And this is how a scope chain is formed which traces back till the Global Contex
 4. If we `try to access them before hand we get the Reference Error`, i.e., `they cannot be accessed before initialization`. Program stops executing further ofc.
 
 - Syntax Errors aren't tolerated and the whole JS file won't even execute.
-- In case of TypeError or Reference Error, the file will run till we get the error and then the execution will stop.
+- In case of TypeError or Reference Error, the file will run until we get the error and then the execution will stop.
 
 - Order of usage: const &rarr; let &rarr; var(never use this)
+
+## Block Scope and Shadowing
+
+Q. What is a block?
+
+- It is also known as compound statement, i.e., combining multiple JS statements into a group.
+
+- Following is called a block and each block has a scope, which starts from the starting curly bracket and ends at the closing curly bracket.
+
+      {
+
+      }
+
+Example:
+
+```js
+if (true) {
+  // Compound statement
+  let a = 10;
+  console.log(a);
+}
+```
+
+- if expects one statement after it's declared but what if we we want to execute multiple statements? That's when we need a block to wrap up all the statements into one block.
+
+- Whatever we can access inside the block comes into its scope.
+
+- Every time a block scope is defined then JS makes a new block scope each time and variables are defined for each block therefore we can say that JS runs block by block.
+
+- These let variables will be defined into what's called a Block Scope and not the Script scope. If we define a let or const variable outside(globally) it would be defined in the Script Scope.
+
+```js
+{
+  var l = 100;
+  let a = 10;
+  const b = 20;
+}
+{
+  let c = 10;
+  const d = 20;
+}
+
+console.log(l); // 100
+console.log(a); // gives Error that a is not defined
+console.log(b); // gives Error that b is not defined
+```
+
+### Shadowing
+
+![Shadowing Example](blockScopeAndShadowing/Shadowing.png)
+
+#### But in case of let and const:
+
+![Shadowing with Let and Const](blockScopeAndShadowing/ShadowingWithLetAndConst.png)
+
+- Even in the case of function scopes we get the same result.
+- Illegal Shadowing: A 'let' cannot be shadowed by 'var', but the opposite is true. Reason: Because the scope of 'var' is global and of 'let' is block/script so in this case it crosses its scope and violates 'let'. Just think of scope like an arrow going down the program from the point of declaration except in case of 'var' it always starts from the top, no matter wherever it's defined.
+
+![Illegal Shadowing](blockScopeAndShadowing/IllegalShadowing.png)
+
+![Illegal Shadowing Exception](blockScopeAndShadowing/IllegalShadowingAllowed.png)
+
+- However, we can shadow `let` with `let`, `const` with `const`, `const` with `let` and vice-versa too and blocks also have lexical environments as such:
+
+![Allowed Shadowing](blockScopeAndShadowing/AllowedShadowing.png)
+
+![Lexical Scope](blockScopeAndShadowing/LexicalScope.png)
