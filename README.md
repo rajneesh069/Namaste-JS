@@ -414,4 +414,9 @@ console.log(b); // gives Error that b is not defined
 ## [First Class Function](./firstClassFunctions/index.js)
 
 - The ability of functions to be used as values, returned as values or be passed as an argument into another function is known as first class functions in JS.
-![image](./firstClassFunctions/image.png)
+  ![image](./firstClassFunctions/image.png)
+
+## [CallBack Functions](./callbackFunctions/index.js)
+
+- Functions taken as input by another function as a parameter are known as Callback functions.
+  ![image](./callbackFunctions/image.png)
