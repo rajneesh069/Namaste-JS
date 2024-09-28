@@ -379,18 +379,19 @@ console.log(b); // gives Error that b is not defined
 - You can think of it like this: When you call that inner function, you just simply go to that actual place of declaration and execute the function as if it was called from it's place of declaration only.
 
 - `Closures remember the scope they were created in, which allows access to variables even after the outer function has returned.`
-  
+
 ![Closures](closures/closures.png)
 
 ### Some nitty-gritties about closures
+
 - When the function is returned, it remembers the lexical scope as well as it takes care of the references of the variables in Memory and they aren't garbage collected, they are retained, hence a became 100 in the following example.
 
   ![Nitty Gritty 1](closures/nitty1.png)
 
-
 - If we have one level deeper nesting, then also it gives us the variable's value, no need to worry, we have seen it in the example of x,y and z functions above.
 
 ### Some use cases of Closures
+
 1. Module Design Pattern
 2. Currying in JS
 3. Memoize
@@ -399,7 +400,18 @@ console.log(b); // gives Error that b is not defined
 6. Iterators
 7. Set Timeouts and many more...!
 
+### Disadvantages of Closures
+
+- Takes too much memory
+- Could lead to memory leaks which would freeze the browser
+
 ### SetTimeout and Closures
+
 ![1](setTimeout+Closures/image.png)
 
 ![2](setTimeout+Closures/image2.png)
+
+## [First Class Function](./firstClassFunctions/index.js)
+
+- The ability of functions to be used as values, returned as values or be passed as an argument into another function is known as first class functions in JS.
+![image](./firstClassFunctions/image.png)
