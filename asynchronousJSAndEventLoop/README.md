@@ -58,7 +58,7 @@ Different types of callback functions go into different queues based on how they
 
 1. Network Request (fetch):
 
-- When you call fetch, it initiates an asynchronous HTTP request. The request itself (the I/O operation) is placed in the Macro Task Queue.
+- When you call fetch, it initiates an asynchronous HTTP request.
 - Once the network request completes (either successfully or with an error), the response is passed to the callback functions (then, catch, and finally). These callbacks are placed in the Micro Task Queue because they are attached to promises.
 
 2. then, catch, finally (Promise Callbacks):
@@ -67,7 +67,7 @@ Different types of callback functions go into different queues based on how they
 
 ## Why is fetch in the Macro Task Queue?
 
-- The network request itself (the part of fetch that sends and waits for the response) is a macro task.
+- The network request itself (the part of fetch that sends and waits for the response) is a macro task(but nothing gets placed in the CallBack Queue, it just falls under this category, its callbacks do go into the microtask queue as they are promises).
 - However, the resolution of the returned promise and its associated callback functions (then, catch, finally) are handled in the Micro Task Queue.
 
 ```js
@@ -106,7 +106,7 @@ console.log("End"); // Step 2: Logs to the console, pushed to the call stack, th
 
 3. `fetch`:
 
-   - The fetch call starts an asynchronous operation to make an HTTP request. This is an I/O operation that involves the Macro Task Queue.
+   - The fetch call starts an asynchronous operation to make an HTTP request. This is an I/O operation that involves the Macro Task Queue(not directly though, nothing gets placed in the CallBack Queue, it just falls under the category of MacroTask as it is an I/O operaton).
    - The request is sent over the network, and the JavaScript engine doesn’t block for it. The promise returned by fetch is still pending at this point.
    - The fetch call is non-blocking, so it is pushed to the call stack, and then popped off.
 
@@ -164,10 +164,9 @@ console.log("End"); // Step 2: Logs to the console, pushed to the call stack, th
 
 ### Key Points:
 
-1. The fetch network request itself is a macro task because it is an I/O operation (handled by the Web API).
-2. The promise returned by fetch is resolved or rejected after the network request completes, and its callbacks (then, catch, finally) are added to the Micro Task Queue.
-3. Microtasks have higher priority than macro tasks, so they are processed first.
-4. The setTimeout callback is a macro task, so it is processed after all microtasks have been executed.
+1. The promise returned by fetch is resolved or rejected after the network request completes, and its callbacks (then, catch, finally) are added to the Micro Task Queue.
+2. Microtasks have higher priority than macro tasks, so they are processed first.
+3. The setTimeout callback is a macro task, so it is processed after all microtasks have been executed.
 
 # What is I/O? Why is Fetch an I/O?
 
