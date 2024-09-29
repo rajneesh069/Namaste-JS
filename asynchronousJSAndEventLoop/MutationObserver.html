@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mutation Observer Demo</title>
+  <style>
+    #container {
+      width: 300px;
+      height: 150px;
+      overflow-y: scroll;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+    }
+    #log {
+      font-size: 14px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+
+<div id="container">
+  <p>Initial content</p>
+</div>
+<button id="addElement">Add New Element</button>
+<div id="log"></div>
+
+<script>
+  // Get the elements
+  const container = document.getElementById('container');
+  const addButton = document.getElementById('addElement');
+  const log = document.getElementById('log');
+
+  // Create a MutationObserver and define its callback
+  const observer = new MutationObserver((mutationsList, observer) => {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'childList') {
+        log.textContent = 'New element added to the container!';
+      } else if (mutation.type === 'attributes') {
+        log.textContent = 'An attribute changed in the container!';
+      }
+    }
+  });
+
+  // Observe the container element for changes in its children and attributes
+  observer.observe(container, { childList: true, attributes: true });
+
+  // Add new elements to the container when the button is clicked
+  addButton.addEventListener('click', () => {
+    const newElement = document.createElement('p');
+    newElement.textContent = 'New content added!';
+    container.appendChild(newElement);
+  });
+</script>
+
+</body>
+</html>

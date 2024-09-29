@@ -420,3 +420,86 @@ console.log(b); // gives Error that b is not defined
 
 - Functions taken as input by another function as a parameter are known as Callback functions.
   ![image](./callbackFunctions/image.png)
+
+## [Asynchronous JS and Event Loop](./asynchronousJSAndEventLoop//index.js)
+
+#### All of the code in JS runs in Call Stack only!
+
+!!! In Call Stack `GEC` is the first thing which is pushed, because remember Call stack helps us to keep track of Execution Contexts !!!
+
+- Browser Model:
+  ![browser-model](./asynchronousJSAndEventLoop/browser-model.png)
+
+- Some Web APIs:
+  ![Some-Web-APIs](./asynchronousJSAndEventLoop/browser-apis.png)
+  1. setTimeout()
+  2. DOM APIs
+  3. fetch()
+  4. localStorage
+  5. console
+  6. location
+
+### Global Object = window
+
+Ex: window.setTimeout(), window.fetch() etc, gives us the access to the Web APIs.
+
+Since window is a global object we don't explicitly need to write the window.something.
+
+- Set Timeout Running
+
+```js
+console.log("start");
+setTimeout(() => {
+  console.log("Hello");
+}, 5000);
+console.log("End");
+```
+
+![setTimeout](./asynchronousJSAndEventLoop/setTimeout.png)
+
+![callbackQueue](./asynchronousJSAndEventLoop/callbackQueue.png)
+
+![eventLoop](./asynchronousJSAndEventLoop/eventLoop.png)
+
+![callbackInCallStack](./asynchronousJSAndEventLoop/callbackInCallStack.png)
+
+- Explanation:
+
+#### 1. Memory Creation Phase (Global Execution Context)
+
+- Variables like `setTimeout`, `console`, and functions are stored in memory.
+- The setTimeout function is recognized as part of the Browser API (Web API).
+
+#### 2. Code Execution Phase (Global Context)
+
+- `console.log("start")`: Printed immediately to the console.
+
+- `setTimeout` API:
+
+  - `setTimeout` is called, and a timer starts (set for 5000ms or 5 seconds).
+  - The callback function is passed to the Web API (Browser Timer).
+  - Code execution continues without waiting for the timer.
+
+- `console.log("End")`: Printed immediately, right after the setTimeout.
+
+#### 3. Timer Expiration (After 5 seconds)
+
+- The Web API completes the timer.
+- The callback function `() => { console.log("Hello"); }` is pushed to the Callback Queue.
+
+#### 4. Event Loop
+
+- Once the call stack is empty (i.e., after `console.log("End")`), the Event Loop moves the callback from the Callback Queue to the Call Stack.
+
+#### 5. Callback Execution
+
+- The callback is executed: `console.log("Hello")` is printed.
+- Thus, the sequence in the console is:
+
+  "start"
+
+  "End"
+
+  (After 5 seconds) "Hello"
+
+Read: [Async in JS Deep Dive](./asynchronousJSAndEventLoop/README.md)
