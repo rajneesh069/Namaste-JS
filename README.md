@@ -503,3 +503,31 @@ console.log("End");
   (After 5 seconds) "Hello"
 
 Read: [Async in JS Deep Dive](./asynchronousJSAndEventLoop/README.md)
+
+## [setTimeout Deep Dive](./setTimeoutDeepDive/index.js)
+
+- Remember: GEC get's popped off when the callback functions of Web APIs run as they run only after synchronous functions finish execution.
+
+```js
+console.log("start");
+
+setTimeout(() => {
+  // setTimeout guarantees atleast 5 seconds of the callback function running
+  console.log("Callback, runs in atleast 10 seconds.");
+}, 5000);
+
+const startDate = new Date().getTime();
+let endDate = startDate + 10_000;
+while (new Date().getTime() < endDate); // runs for 10 seconds
+
+console.log("End");
+```
+
+```js
+setTimeout(() => {
+  console.log("Runs in atleast 0 seconds.");
+}, 0);
+
+// setTimeout will always be sent to the Web APIs then the timer of even 0s will be set and it'll go to the callback queue and then
+// it comes to the call stack
+```
