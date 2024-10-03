@@ -602,3 +602,80 @@ Array.prototype.calculate = function (logic) {
 
 console.log(radii.calculate(area));
 ```
+
+## map, filter and reduce
+
+- All the three methods are used to iterate over an array and do something.
+- map: iterate over the array and apply some logic to each element, it returns a new array with that applied logic.
+- filter: iterate over the array and based on some logic filter out the elements, a new array with those filters is returned.
+- reduce: iterate over the array and find a single value for some given logic, it returns `a value`.
+
+```js
+const users = [
+  { firstName: "akshay", lastName: "saini", age: 26 },
+  { firstName: "rajneesh", lastName: "mishra", age: 22 },
+  { firstName: "sachin", lastName: "mishra", age: 22 },
+  { firstName: "akshita", lastName: "joshi", age: 22 },
+  { firstName: "johnny", lastName: "depp", age: 57 },
+];
+```
+
+Examples based on the above array:
+
+1. map(): Print the full names of the users
+
+```js
+console.log(users.map((user) => user.firstName + " " + user.lastName));
+```
+
+2. reduce(): Find the number of users with a particular age
+
+- Whatever is returned in the callback function is updated in the accumulator parameter
+- Example 1:
+
+```js
+const arraySum = arr.reduce((acc, el) => acc + el, 0);
+console.log("array sum:", arraySum);
+```
+
+- Example 2:
+
+```js
+// {26 : 1, 22 : 3, 57:1}
+const mapOfAges = users.reduce((acc, curr) => {
+  if (acc[curr.age]) {
+    acc[curr.age]++;
+  } else {
+    acc[curr.age] = 1;
+  }
+  return acc;
+}, {});
+
+console.log(mapOfAges);
+```
+
+3. filter(): Find the firstName of all the users whose ages are less than 30
+
+- When the condition in the callback function is `true` that value is added to the returned array.
+- Method 1:
+
+```js
+const output = users
+  .filter((user) => user.age < 30)
+  .map((user) => user.firstName);
+// yes they can be chained too!
+
+console.log(output);
+```
+
+- Method 2: Using reduce to do the same
+
+```js
+const output2 = users.reduce((acc, curr) => {
+  if (curr.age < 30) {
+    acc.push(curr.firstName);
+  }
+  return acc;
+}, []);
+console.log(output2);
+```
