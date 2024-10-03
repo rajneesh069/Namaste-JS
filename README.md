@@ -603,7 +603,7 @@ Array.prototype.calculate = function (logic) {
 console.log(radii.calculate(area));
 ```
 
-## map, filter and reduce
+## [map, filter and reduce](./mapFilterAndReduce/index.js)
 
 - All the three methods are used to iterate over an array and do something.
 - map: iterate over the array and apply some logic to each element, it returns a new array with that applied logic.
@@ -624,13 +624,15 @@ Examples based on the above array:
 
 1. map(): Print the full names of the users
 
+- Whatever is returned from the callback is added as an element to the returned array.
+
 ```js
 console.log(users.map((user) => user.firstName + " " + user.lastName));
 ```
 
 2. reduce(): Find the number of users with a particular age
 
-- Whatever is returned in the callback function is updated in the accumulator parameter
+- Whatever is returned in the callback function is updated in the accumulator parameter.
 - Example 1:
 
 ```js
@@ -656,6 +658,7 @@ console.log(mapOfAges);
 
 3. filter(): Find the firstName of all the users whose ages are less than 30
 
+- We return true or false based on some logic in the callback function.
 - When the condition in the callback function is `true` that value is added to the returned array.
 - Method 1:
 
@@ -677,5 +680,35 @@ const output2 = users.reduce((acc, curr) => {
   }
   return acc;
 }, []);
+
 console.log(output2);
 ```
+
+## [Callbacks and Callback Hell](./callbackHell/index.js)
+
+- Callbacks: Functions which are passed as a parameter/returned as a value from another functions.
+
+  - These functions are the reason asynchronous programming is possible in JS because we need to do some work when some async task finishes and till then these functions are stored in the memory and are executed later when the async task is complete.
+
+- Higher Order functions: Functions which take functions as parameters or return them as values.
+
+- Issues with Callback functions:
+  1. Callback Hell(also known as Pyramid of Doom): When functions are being passed/returned one inside the other forming a complex nested structure.
+
+```js
+api.addToCart(cart, function () {
+  api.proceedToPayment(order, function () {
+    api.showOrderSummary(wallet, function () {
+      api.updateUserWallet(wallet);
+    });
+  });
+});
+```
+
+- As we can see that the callbacks are being passed one into the another and this makes the code unreadable and unmaintainable.
+- The above structure is also called Pyramid of Doom.
+
+2. Inversion of Control: When we pass callbacks as parameters or return them as values, then the control of the function which returned/took the callback as a parameter is shifted to the callback as now the output will be decided by the callback functions's value!
+
+- The above code also poses a problem of inversion of control where we give the control of one function to another callback
+  and so on and eventually losing control of the main function.
