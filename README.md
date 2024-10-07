@@ -712,3 +712,41 @@ api.addToCart(cart, function () {
 
 - The above code also poses a problem of inversion of control where we give the control of one function to another callback
   and so on and eventually losing control of the main function.
+
+## [Promises](./promises/index.js)
+
+- Definition: A Promise is an object representing the eventual completion or failure of an asynchronous operation.
+
+- They are used to handle async operations neatly.
+- They only have 3 states: Pending, Fulfilled and Rejected.
+- Before promises, no `fetch` API used to exist and neither the microtask queue!
+
+- The async operations were handled using callbacks only which led to a very un-readable code structure.
+- Callbacks are back bone of async operations and hence came the need to resolve Callback Hell and Inversion of control.
+
+- Promises provide a very neat way to handle async tasks and use .then() and .catch() to handle resolution or rejection of a promise.
+- Initial promise object looks like the following:
+
+```js
+const user = fetch(GITHUB_API); // it is undefined until this line executes, once it does user looks like the following object!
+{
+  [[Prototype]] : Promise,
+  [[PromiseState]] : Pending, // waiting to be resolved or rejected
+  [[PromiseResult]] : undefined
+}
+
+// the response given by the fetch call will be stored in the [[PromiseResult]], and the [[PromiseState]]
+// will either be fulfilled or rejected.
+
+{
+  [[Prototype]] : Promise,
+  [[PromiseState]] : "fulfilled",
+  [[PromiseResult]] : Response // it's an object that contains several keys and a body!
+}
+
+user.then((data)=>{
+  console.log(data); // logs the response upon resolution
+})
+
+// promise object is immutable, user.someone = "Rajneesh" isn't allowed.
+```
