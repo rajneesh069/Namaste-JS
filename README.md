@@ -752,3 +752,194 @@ user.then((data)=>{
 ```
 
 ## [Promises Deep Dive](./creatingPromises/index.js)
+
+- Name of parameters could be anything, though we try to give meaningful names, that's it.
+
+1. Promise Creation/Promise Production: For that we use `Promise` constructor given by JS.
+
+```js
+const promise = new Promise((res, rej)=>{
+  if(/* some condition */){
+    res("Promise resolved");
+  }else{
+    rej("Promise Rejected");
+  }
+})
+```
+
+- The above code demonstrates how to create a promise.
+  1. The promise constructor takes a callback function as an input which in turn takes two parameters(res: resolve and rej:reject) pased by JS automatically, no need to worry.
+  2. Upon `successful completion`, we `resolve/fulfill the promise with some result`, which is taken as a parameter by the resolve function itself. The parameter taken by resolve can be anything ofcourse, not necessarily a string, even one can resolve with another promise.
+  3. Upon `unsuccessful completion`, we `reject the promise with some error`, which is taken as a parameter by the reject function itself.
+
+2. Handling/Consumption of a promise: For this purpose we have two methods given by JS namely `.then()` and `.catch()` which help us in `attaching`(NOT passing) callbacks when the promise is `resolved with a result` or `rejected with an error`.
+
+- There's one more `.finally()` method as well, it simply ensures that whatever is passed as a cb(callback function) in it always runs even if we give a return statement even inside `.then()` and `.catch()` methods.
+
+```js
+promise
+  .then((result) => {
+    console.log(result);
+  })
+  .catch((error) => {
+    // Without catch if error is thrown, Browser/Node.js will give us an error that Unhandled Error is there.
+    console.error(error); // to print the error in red colour.
+  })
+  .finally(() => console.log("No matter what happens, this always runs!"));
+```
+
+3. Chaining of Promises: If promise is returned by another promise upon the completion or there are multiple promises and we want to process their results/errors sequentially we use the concept of promise chaining where we return the promise itself in the `.then()`/`.catch()` method(generally we use .then() for the purpose) and the chain will wait for its resolution/rejection and will be handled by the subsequent `.then()` and `.catch()` methods.
+
+- Promise returned by another promise(could be done in both, resolve or reject, doesn't matter):
+
+```js
+const firstPromise = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    console.log("First promise resolved!");
+    resolve(
+      new Promise((resolve, reject) => {
+        setTimeout(() => {
+          console.log("Second promise running!");
+          if (Math.random() > 0.5) {
+            reject("Final error from second promise");
+          } else {
+            resolve("Second Promise Resolved!");
+          }
+        }, 1000);
+      })
+    );
+  }, 1000);
+});
+
+firstPromise
+  .then((result) => {
+    return result; // result is the second promise, so this will wait for its resolution
+  })
+  .then((finalResult) => {
+    console.log(finalResult); // Logs the final result from the second promise
+  })
+  .catch((error) => {
+    console.error(error); // Handles any rejection from either promise
+  });
+```
+
+- Handling multiple individual promises sequentially:
+
+```js
+const firstPromise = new Promise((res, rej) => {
+  const value = Math.random();
+  if (value > 0.5) {
+    res({ message: "First Promise Resolved.", value });
+  } else {
+    rej({ message: "First Promise Rejected", value });
+  }
+});
+
+const secondPromise = new Promise((res, rej) => {
+  setTimeout(() => {
+    if (Math.random() < 0.5) {
+      res("Second Promise resolved after 2s.");
+    } else {
+      rej("Second Promise rejected after 2s.");
+    }
+  }, 2000);
+});
+
+const thirdPromise = new Promise((res, rej) => {
+  res("Too lazy to reject, sorry guys, third promise resolved!");
+});
+
+firstPromise
+  .then((firstPromiseResult) => {
+    console.log(firstPromiseResult);
+    return secondPromise;
+  })
+  .then((secondPromiseResult) => {
+    console.log(secondPromiseResult);
+    return thirdPromise;
+  })
+  .then((thirdPromiseResult) => {
+    console.log(thirdPromiseResult);
+    /* DO NOT return a value in between except a promise while chaining promises,
+    because that will stop the chain from recognising the error of any promise in sequence 
+    and won't be able to pass it down to the final catch which would have eventually stopped 
+    the execution at that promise. */
+  })
+  .catch((error) => console.log(error));
+```
+
+- The errors and results both are passed down the chain.
+
+3. Handling errors of each promise individually in the chain:
+
+```js
+firstPromise
+  .then((firstPromiseResult) => {
+    console.log(firstPromiseResult);
+    return secondPromise;
+  })
+  .catch((firstPromiseError) => console.log(firstPromiseError))
+
+  .then((secondPromiseResult) => {
+    // this runs regardless of the second promise being resolved or rejected
+    console.log("hello:", secondPromiseResult);
+    return thirdPromise;
+  })
+  .catch((secondPromiseError) => console.error(secondPromiseError))
+
+  .then((thirdPromiseResult) => {
+    console.log(thirdPromiseResult);
+  })
+  .catch((thirdPromiseError) => console.error(thirdPromiseError))
+  .then(() => console.log("This will run no matter what!"));
+```
+
+- Rules of Execution:
+  - Resolved promises continue to the next `.then()`.
+  - Rejected promises go to the nearest `.catch()`.
+  - After the `.catch()`, the chain resumes at the next `.then()` (with an undefined result if you don’t re-throw the error).
+
+### A curious case with the above code
+
+- Output: In a case where the first promise got resolved but the second promise got rejected and third promise still got resolved!
+
+```bash
+{message: 'First Promise Resolved.', value: 0.888345905114871 }
+Second Promise rejected after 2s.
+hello: undefined
+thirdPromiseResult: Too lazy to reject, sorry guys, third promise resolved!
+This will run no matter what!
+```
+
+- Returning from a `.then()`:
+
+  - When you return a value (or a promise) from a `.then()` block, it will replace the resolved value for the subsequent `.then()` in the chain.
+  - If the returned value is a promise and it rejects, that rejection will be caught by the nearest .catch() block in the chain.
+  - If you return a promise that resolves in a `.then()`, it allows you to continue the chain normally.
+
+- Returning from a `.catch()`:
+
+  - When you return a value (or a promise) from a `.catch()` block, it acts as if you handled the error and allows the chain to continue to the next `.then()`.
+  - The returned value from a `.catch()` will be passed to the next `.then()` block. If the returned promise from the `.catch()` rejects, the next `.catch()` will handle that rejection.
+
+- In the above output, if the second promise rejects it was handled by the `.catch()` block nearest to it and since we used the arrow function and returned nothing(it was just a `console.error()` statement in the case of `secondPromiseError`) hence when the 2nd `.then()` block ran(as when we return a value from `.catch()` it means error has been handled and proceed to the next `.then() in order`) we got undefined, as there was no `secondPromiseResult` to begin with!
+
+- Also if there's a `.then()` in the end it will run for sure, no matter what.
+
+#### Put relevant `.catch()` blocks wherever needed no need to put them for each and every promise.
+
+### Don't fall in Promise Hell
+
+```js
+createOrder(cart)
+  .then((orderId) => {
+    // we can do this as well, but this will lead to promise hell!
+    proceedToPayment(orderId)
+      .then((status) => console.log(status))
+      .catch((error) => console.log(error));
+  })
+  .catch((error) => {
+    console.log(error);
+  })
+  .then(() => console.log("This will run no matter what!"));
+```

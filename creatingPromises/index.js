@@ -88,3 +88,6 @@ createOrder(cart)
     console.log(error);
   })
   .then(() => console.log("This will run no matter what!"));
+
+/* When we return a value (not a promise) inside a .then() method, 
+  that value is automatically wrapped in a resolved promise. The next .then() receives this value. */
