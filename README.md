@@ -750,3 +750,5 @@ user.then((data)=>{
 
 // promise object is immutable, user.someone = "Rajneesh" isn't allowed.
 ```
+
+## [Promises Deep Dive](./creatingPromises/index.js)
