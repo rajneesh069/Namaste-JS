@@ -943,3 +943,92 @@ createOrder(cart)
   })
   .then(() => console.log("This will run no matter what!"));
 ```
+
+## [Promise APIs](./PromiseAPIs/index.js)
+
+- Example Code:
+
+```js
+const p1 = new Promise((res, rej) => {
+  setTimeout(() => {
+    return rej("p1 rejected");
+    // return res("p1 resolved");
+  }, 3000);
+});
+
+const p2 = new Promise((res, rej) => {
+  setTimeout(() => {
+    // return res("p2 resolved");
+    return rej("p2 rejected");
+  }, 1000);
+});
+
+const p3 = new Promise((res, rej) => {
+  setTimeout(() => {
+    return rej("p3 rejected");
+    // return res("p3 resolved");
+  }, 2000);
+});
+```
+
+1. Promise.all()
+
+- Promise.all() API is a `fail fast API`, and if any one of the promises get rejected it gives an error and stops the execution or else it will wait for all the promises to get resolved and output an array of results which could be processed through the .then() method.
+
+```js
+Promise.all([p1, p2, p3])
+  .then((result) => console.log(result))
+  .catch((error) => console.error(error));
+```
+
+- Output:
+
+  1. When all the promises resolve:
+     ![Promise.all() resolved case](./PromiseAPIs/image.png)
+
+  2. When any one of the promises get rejected:
+     ![Promise.all() rejected case](./PromiseAPIs//image1.png)
+
+2. Promise.allSettled()
+
+- Waits for all promises to settle(resolve/reject) and returns an array of the results whether it is resolved or rejected.
+
+```js
+Promise.allSettled([p1, p2, p3])
+  .then((result) => console.log(result))
+  .catch((error) => console.error(error));
+```
+
+- Output:
+  ![Promise.allSettled() output](<./PromiseAPIs/promise.allSettled().png>)
+
+3. Promise.race()
+
+- Waits until the first promise settles(either resolves or gets rejected) and returns its output.
+
+```js
+Promise.race([p1, p2, p3])
+  .then((result) => console.log(result))
+  .catch((error) => console.error(error));
+```
+
+- Output:
+  ![Promise.race() output](<./PromiseAPIs/promise.race().png>)
+
+4. Promise.any()
+
+- Waits until any one of the promises gets resolved and then it returns its output, if none of the promises resolve, it simply returns an array of errors known as Aggregated error.
+
+```js
+Promise.any([p1, p2, p3])
+  .then((result) => console.log(result))
+  .catch((err) => console.error(err));
+```
+
+- Output:
+
+  1. Atleast one succeed
+     ![Promise.any() atleast one succeed](<./PromiseAPIs/promise.race().png>)
+
+  2. None Succeed
+     ![Promise.any() none succeed](<./PromiseAPIs/promise.any()1.png>)
