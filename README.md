@@ -374,6 +374,8 @@ console.log(b); // gives Error that b is not defined
 
 ![Lexical Scope](blockScopeAndShadowing/LexicalScope.png)
 
+- Think of the lexical environment as a series of nested boxes, where each box has access to the variables in its outer box (parent scope), but inner boxes have their own variables too.
+
 ## Closures: Bundle of Lexical Scope of a function + itself
 
 - When a function is returned from another function `it rememebers the enclosed(lexical) scope` along with the function which is being returned. So basically a closure is returned, instead of just the function code.
@@ -1353,3 +1355,135 @@ obj.x();
 ```
 
 - In this case it represents the object itself, because the enclosing lexical environment is the object!
+
+## Call, bind and apply methods in JS
+
+### - These methods are used to share/borrow functions. They are used to set the context of `this` for a function inside it.
+
+```js
+const obj = {
+  firstName: "Rajneesh",
+  lastName: "Mishra",
+};
+
+const obj2 = {
+  firstName: "Sachin",
+  lastName: "Mishra",
+};
+
+function printFullName() {
+  console.log(this.firstName + " " + this.lastName);
+}
+
+function printEverything(hometown, state, country) {
+  console.log(
+    this.firstName +
+      " " +
+      this.lastName +
+      " is from " +
+      hometown +
+      ", " +
+      state +
+      ", " +
+      country +
+      "."
+  );
+}
+```
+
+1. `.call()`
+
+- The call method is used to call a function with a particular `this` value. And then the function could be called for any object, by setting the context.
+
+```js
+printFullName.call(obj); // Rajneesh Mishra
+printFullName.call(obj2); // Sachin Mishra
+```
+
+- It takes the first argument as the value of `this` and rest all of the arguments are of the function which is being called.
+
+```js
+printEverything.call(obj, "Gonda", "Uttar Pradesh", "India"); // Rajneesh Mishra is from Gonda, Uttar Pradesh, India.
+```
+
+2. `.apply()`
+
+- It takes rest of the arguments as an array instead of them being spread out like in the `.call()` method.
+- The function is called here as well upon the application of `.apply()` method on a function.
+
+```js
+printEverything.apply(obj, ["Gonda", "Uttar Pradesh", "India"]);
+```
+
+3. `.bind()`
+
+- Returns a copy of the original function with the `this` value set to be of that object.
+- It is used to bind a function to a particular function to an object.
+
+```js
+const printEverythingForObj = printEverything.bind(obj, "Gonda"); // Gonda is set as the first argument for printEverything function.
+printEverythingForObj("Uttar Pradesh", "India"); // Rest of the arguments are set here, we could have set it before as well.
+```
+
+### Currying using `.bind()` and `closures`
+
+- Definition: Currying in JavaScript is a technique where a function is transformed into a series of nested functions, each of which takes a single argument. Instead of passing all arguments at once, you pass them one at a time. The function keeps returning new functions until all arguments have been provided, at which point the final result is computed.
+
+```js
+function multiply(x, y) {
+  console.log(x * y);
+}
+```
+
+1. Using the `.bind()` method
+
+```js
+const multiplyBy2 = multiply.bind(this, 2); // we don't care about the `this` value passed here.
+multiplyBy2(3); // Since the first argument is set before hence whatever is passed here will be taken as y.
+multiplyBy2(3, 4); // 4 is ignored, as the first value has been preset using the .bind() method.
+
+const multiplyBy3 = multiply.bind(this, 3);
+multiplyBy3(6); // 18
+
+const someConstant = multiply.bind(this, 2, 43);
+someConstant(21, 432); // the arguments are ignored and we always get 2*43 = 86, because they have been preset using the .bind() method.
+```
+
+- We preset the parameters and make functions out of the existing functions as per our use.
+
+2. Using closures
+
+- Example 1:
+
+```js
+function multiplyAgain(x) {
+  return function (y) {
+    console.log(x * y);
+  };
+}
+
+const multiplyByTwo = multiplyAgain(2); // this returns the inner function, which has 'y' as argument hence when we call the multiplyBy2 function
+// we can pass any number and that would be multiply by 2 due to the structure.
+
+multiplyByTwo(33); // 66
+```
+
+- In the above code, the inner function is returned which leads to us using it to pass the second argument.
+
+- Example 2:
+
+```js
+function addThreeNumbers(x) {
+  return function (y) {
+    return function (z) {
+      console.log(x + y + z);
+      return x + y + z;
+    };
+  };
+}
+
+const sum = addThreeNumbers(1)(2)(3);
+console.log(sum); // 6
+```
+
+- Or we can keep returning series of functions and can call all of them like this.
