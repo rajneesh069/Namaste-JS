@@ -1273,7 +1273,7 @@ console.log(
 
 #### No new timers are started if an `await` or a `.then()`/`.catch()` is encountered.
 
-## `This` keyword in JS
+## [`This` keyword in JS](./thisInJS/index.js)
 
 ### This in Global Scope
 
@@ -1310,6 +1310,8 @@ window.someFn();
 - Now, `this` will point to the `window` object, so it does depend on `how the function is called`.
 
 3. Functions in objects
+
+- Regular functions have their own `this` which points to global object in `non-strict` mode and is `undefined` in `strict` mode. While arrow functions don't have their own `this` and they retain that value from `enclosing lexical scope`.
 
 ```js
 const obj = {
@@ -1356,7 +1358,7 @@ obj.x();
 
 - In this case it represents the object itself, because the enclosing lexical environment is the object!
 
-## Call, bind and apply methods in JS
+## [Call, bind and apply methods in JS](./callApplyAndBindInJS/index.js)
 
 ### - These methods are used to share/borrow functions. They are used to set the context of `this` for a function inside it.
 
@@ -1486,4 +1488,74 @@ const sum = addThreeNumbers(1)(2)(3);
 console.log(sum); // 6
 ```
 
-- Or we can keep returning series of functions and can call all of them like this.
+- Or we can keep returning a series of functions and can call all of them like this.
+
+## Polyfilling in JS
+
+- In the context of JavaScript (JS), polyfilling means adding code that implements modern JavaScript features in environments (usually older browsers) where those features are not natively supported. A polyfill is typically a script that "fills in" the gaps in functionality that a browser or environment lacks.
+
+- Example of polyfilling:
+
+```js
+if (!Array.prototype.includes) {
+  Array.prototype.includes = function (element) {
+    return this.indexOf(element) !== -1;
+  };
+}
+```
+
+- Let's implement .map(), .filter(), .reduce() and .bind() polyfills.
+
+1. `.bind()`
+
+```js
+Function.prototype.myBind = function (...args1) {
+  // Here `this` points to the function which calls the .myBind() function
+  const originalFunc = this; // Save reference to the original function
+  return function (...args2) {
+    return originalFunc.apply(args1[0], [...args1.slice(1), ...args2]);
+  };
+};
+```
+
+2. `.map()`
+
+```js
+Array.prototype.myMap = function (cb) {
+  let output = [];
+  // here this points to the array which calls the .myMap() function on itself.
+  for (let i = 0; i < this.length; i++) {
+    output.push(cb(this[i], i, this));
+  }
+
+  return output;
+};
+```
+
+3. `.filter()`
+
+```js
+Array.prototype.myFilter = function (cb) {
+  let output = [];
+
+  for (let i = 0; i < this.length; i++) {
+    if (cb(this[i], i, this)) output.push(this[i]);
+  }
+
+  return output;
+};
+```
+
+4. `.reduce()`
+
+```js
+Array.prototype.myReduce = function (cb, initialAccValue) {
+  let output = initialAccValue === undefined ? this[0] : initialAccValue;
+
+  for (let i = 0; i < this.length; i++) {
+    output = cb(output, this[i]);
+  }
+
+  return output;
+};
+```

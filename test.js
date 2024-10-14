@@ -34,7 +34,7 @@ promise1
   });
  */
 
-const firstPromise = new Promise((res, rej) => {
+/* const firstPromise = new Promise((res, rej) => {
   const value = Math.random();
   if (value > 0.5) {
     res({ message: "First Promise Resolved.", value });
@@ -78,3 +78,23 @@ firstPromise
     console.log("thirdPromiseResult:", thirdPromiseResult);
   })
   .catch((thirdPromiseError) => console.error(thirdPromiseError));
+
+ */
+Function.prototype.myBind = function (...args1) {
+  return (...args2) => {
+    console.log(this)
+    return this.apply(args1[0], [...args1.slice(1), ...args2]);
+  }
+};
+
+function printName(hometown, state, country) {
+  console.log(this.firstName + " " + this.lastName + " is from " + hometown + ", " + state + ", " + country);
+}
+
+const obj = {
+  firstName: "Rajneesh",
+  lastName: "Mishra"
+}
+
+const print = printName.myBind(obj, "Gonda", "Uttar Pradesh");
+print("India");
