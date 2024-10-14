@@ -101,14 +101,14 @@ In the code component, the code is executed one line at a time one by one, which
 
 ## Call Stack maintains the order of execution of execution Contexts.
 
-- `It stores GEC at its bottom, then the EC for square(n) function call, after that's done, it pops it off once its returned and then again puts in the EC of the second function call, i.e., sqaure(4) and pops it off once its done executing and finally pops off GEC from the stack.`
+- `It stores GEC at its bottom, then the EC for square(n) function call, after that's done, it pops it off once its returned and then again puts in the EC of the second function call, i.e., square(4) and pops it off once its done executing and finally pops off GEC from the stack.`
 
 - This is how JS Engine manages the creation and deletion of Execution Contexts efficiently and keeps track of the order of the execution contexts.
-- Also known as Execution Context Stack, Program Stack, Control Stack, Runtime Stack and Machine Stack, all of the same are the same thing- THE CALL STACK.
+- Also known as Execution Context Stack, Program Stack, Control Stack, Runtime Stack and Machine Stack, all of the same are the same thing - THE CALL STACK.
 
 ## [Hoisting in JS](/hoistingInJS/index.js)
 
-- Formal Definition: In JavaScript, hoisting is a mechanism where variable and function declarations are moved to the top of their scope (either global or function scope) during the compilation phase, before the code is executed. This means you can use variables and functions before they are declared in the code.
+- Formal Definition: In JavaScript, hoisting is a mechanism where `variable and function(even async ones, if declared witha function keyword) declarations are moved to the top of their scope (either global or function scope) during the compilation phase, before the code is executed.` This means you can use variables and functions before they are declared in the code.
 
 ```js
 getName(); // this prints Hello ofcourse
@@ -156,11 +156,13 @@ var someFn = () => {
 
 1. Firstly, the GEC comes into the picture then the memory creation phase starts.
 
-2. What really happens is that during the memory creation phase all the variables and functions are assigned/allocated memory, where the variables of type var are set as undefined and the function body is moved in the GEC.
+2. What really happens is that during the memory creation phase all the variables and functions(NOT callbacks!) are assigned/allocated memory, where the variables of type var are set as undefined and the function body is moved in the GEC.
 
-3. Then, when the code is executed, and if we try to access the variable even before the definition/declaration, we get undefined because it was assigned undefined in the memory creation phase, and the functions work properly as they were put in the GEC before in the memory creation phase only.
+3. Then, when the code is executed, and if we try to access the variable(`var` type obviously) even before the definition/declaration, we get undefined because it was assigned undefined in the memory creation phase, and the functions work properly as they were put in the GEC before in the memory creation phase only.
 
-4. However, if we declare arrow functions using the var keyword, the function will be assinged undefined in the memory as it is treated as a variable and not a function, even if we use the anonymous function and assign it to a var, it will be treated as a variable only, that's why if we try to call that function it'll give us an error that getName is not a function as it is being treated as a variable and NOT a function.
+4. However, if we declare arrow functions using the `var` keyword, the function will be assigned `undefined` in the memory as it is treated as a variable and not a function(since JS doesn't know if it's a function yet!), even if we use the anonymous function and assign it to a var, it will be treated as a variable only, that's why if we try to call that function it'll give us an error that `getName is not a function` as it is being treated as a variable and NOT a function.
+
+- Callbacks(functions which are passed as parameters to other functions, it'll be discussed later) aren't registered in the memory during the `Memory Creation/Hoisting` Phase, it is `registered only during the Code Execution Phase`.
 
 ### Call Stack in this scenario
 
@@ -686,6 +688,8 @@ console.log(output2);
 
 ## [Callbacks and Callback Hell](./callbackHell/index.js)
 
+### Callbacks are NOT hoisted, i.e., they aren't registered in memory during the memory execution phase and are only kept in memory when they are `encountered in the Code Execution Phase.`
+
 - Callbacks: Functions which are passed as a parameter/returned as a value from another functions.
 
   - These functions are the reason asynchronous programming is possible in JS because we need to do some work when some async task finishes and till then these functions are stored in the memory and are executed later when the async task is complete.
@@ -715,16 +719,16 @@ api.addToCart(cart, function () {
 
 ## [Promises](./promises/index.js)
 
-- Definition: A Promise is an object representing the eventual completion or failure of an asynchronous operation.
+- Definition: `A Promise is an object representing the eventual completion or failure of an asynchronous operation.`
 
 - They are used to handle async operations neatly.
-- They only have 3 states: Pending, Fulfilled and Rejected.
+- `They only have 3 states: Pending, Fulfilled and Rejected.`
 - Before promises, no `fetch` API used to exist and neither the microtask queue!
 
 - The async operations were handled using callbacks only which led to a very un-readable code structure.
-- Callbacks are back bone of async operations and hence came the need to resolve Callback Hell and Inversion of control.
+- Callbacks are back bone of async operations and hence came the need to resolve `Callback Hell and Inversion of control`.
 
-- Promises provide a very neat way to handle async tasks and use .then() and .catch() to handle resolution or rejection of a promise.
+- Promises provide a very neat way to handle async tasks and use `.then()` and `.catch()` to handle resolution or rejection of a promise.
 - Initial promise object looks like the following:
 
 ```js
@@ -758,14 +762,29 @@ user.then((data)=>{
 1. Promise Creation/Promise Production: For that we use `Promise` constructor given by JS.
 
 ```js
-const promise = new Promise((res, rej)=>{
-  if(/* some condition */){
+const promise = new Promise((res, rej) => {
+  if (true /* could be some other condition as well */) {
     res("Promise resolved");
-  }else{
+  } else {
     rej("Promise Rejected");
   }
-})
+});
 ```
+
+- The Promise executor function(the callback it takes as a parameter) runs `synchronously`. But the callbacks of `.then()` and `.catch()` run `asynchronously`.
+- The moment the line `const promise` is encountered in the `Code Execution Phase`(because `callbacks are registered in the Code Execution Phase only`), a Promise object is created and assigned to the `promise` variable. It looks like this:
+
+```js
+{
+  [[Prototype]] : Promise,
+  [[PromiseState]] : "fulfilled", // since the if(true) runs immediately, or else it'll be pending if it's a timeout or some API call
+  [[PromiseResult]] : undefined
+}
+```
+
+- And at the moment only, the `executor runs synchronously`, yes! `It runs at that moment only synchronously`, then depending on whatever is written inside the executor function runs, `if it's a timeout it'll be sent to the Web APIs, if it's a console.log() statement it'll be executed right there and then!`
+
+- Then when the code reaches the `.then()` and `.catch()` line, it registers their callbacks to be executed later(depending on the promise if it's rejected or resolved/fulfilled), `yes this is asynchronous`, even if the Promise has already been resolved then also we won't see the result yet and once `GEC(Global Execution Context)` is popped off the stack, the callback in the microtask queue is sent to the `Call Stack` and in our case the callback of `.then()` method runs.
 
 - The above code demonstrates how to create a promise.
   1. The promise constructor takes a callback function as an input which in turn takes two parameters(res: resolve and rej:reject) pased by JS automatically, no need to worry.
@@ -1032,3 +1051,221 @@ Promise.any([p1, p2, p3])
 
   2. None Succeed
      ![Promise.any() none succeed](<./PromiseAPIs/promise.any()1.png>)
+
+## [Async/Await in JS](./async-awaitInJS/index.js)
+
+### - An async function always returns a promise, if we return it ourselves then well and good, if not then it wraps the value in a promise with a fulfilled state and returns it.
+
+```js
+async function getData() {
+  return "Namaste";
+}
+
+const dataPromise = getData();
+dataPromise.then((res) => console.log(res));
+
+const p = new Promise((res, rej) => {
+  res("Promise Resolved");
+});
+
+async function getData2() {
+  return p; // a new promise won't be returned, the promise would be returned as it is
+}
+
+const dp = getData2();
+
+dp.then((res) => console.log(res));
+```
+
+- `Async and await combo is used to handle/consume promises.`
+
+### Promise resolution before async/await
+
+```js
+const p = new Promise((res, rej) => {
+  res("Promise Resolved");
+});
+
+function getTheData() {
+  p.then((res) => console.log(res));
+}
+
+getTheData(); // Promise Resolved
+```
+
+### Promise resolution after async/await
+
+- await keyword can `only` be used inside an async function.
+
+```js
+async function getTheDataUsingAwait() {
+  const val = await p; // await keyword is written before the promise and the resolved value is assigned to `val` variable
+  return val;
+}
+
+console.log(getTheDataUsingAwait()); // Promise Resolved
+```
+
+### Difference between handling the Promise using traditional way and the async/await way
+
+```js
+const p1 = new Promise((res, rej) => {
+  setTimeout(() => {
+    res("Promise resolved after 10 seconds.");
+  }, 10000);
+});
+
+function resolvePromiseTheTraditionalWay() {
+  // JS engine will not wait for the promise to be resolved
+  p.then((res) => console.log(res));
+  console.log("Rajneesh");
+}
+
+resolvePromiseTheTraditionalWay();
+/* 
+    Rajneesh
+    Promise Resolved, printed after 10 seconds
+*/
+
+async function resolvePromiseUsingAsyncAwait() {
+  console.log("Hello World");
+  const val = await p1; // resolved value is assigned to the `val` variable
+  console.log("Hello Rajneesh");
+  console.log(val);
+  return val;
+}
+
+resolvePromiseUsingAsyncAwait();
+/* 
+        Hello World
+After 10 seconds,
+        Hello Rajneesh 
+        Promise Resolved Value
+*/
+```
+
+- As we can see, in case of async/await the program(function) executed further only after the promise settled(resolved in this case after 10 seconds).
+- But in case of promises, the callback was registered in the memory and then the function execution continued.
+
+- async functions get hoisted during the memory creation phase if created with a `function` keyword, if created using `var`, `let` or `const` they will be `undefined` or in TDZ(Temporal Dead Zone) until the `Code Execution Phase` starts.
+
+### Execution of async function
+
+- The code is self explanatory.
+
+```js
+const p3 = new Promise((res, rej) => {
+  console.log(
+    "Inside executor function, it runs synchronously right at the moment this line runs in the Code Execution Phase!"
+  );
+  setTimeout(() => {
+    res("Promise Resolved after 20 seconds.");
+  }, 20_000);
+  console.log(
+    "setTimeout has been sent to Web APIs and now the timer of 20s has started.\n"
+  );
+});
+
+const p4 = new Promise((res, rej) => {
+  console.log(
+    "Inside executor function, it runs synchronously right at the moment this line runs in the Code Execution Phase!"
+  );
+  setTimeout(() => {
+    res("Promise Resolved after 10 seconds.");
+  }, 10_000);
+  console.log(
+    "setTimeout has been sent to Web APIs and now the timer of 10s has started.\n"
+  );
+});
+
+async function handlePromise() {
+  console.log("This line will run the moment this function is called.\n");
+
+  const result1 = await p3; // here the function execution will be suspended
+  console.log(
+    "This line will only run once the result has been assigned to the resul1 variable, till then the function execution is suspended."
+  );
+  console.log("result1:", result1);
+
+  const result2 = await p4;
+  console.log(
+    "This line will only run once the result from p4 has been assigned to result2 variable, till then the function is again suspended"
+  );
+  console.log("result2:", result2);
+
+  console.log(
+    "This line will run once, all the promise results have been logged and in this case both would have been logged simultaneously because in 20s both promises got resolved/fulfilled.\n"
+  );
+}
+
+handlePromise();
+
+console.log(
+  "Till handlePromise() function is suspended this line will run in Call Stack.\n"
+);
+```
+
+- Whenever an async function encounters an await statement inside it, its execution is suspended until the result of that promise is assigned to the variable or until it get's rejected with an error, after that it again comes back to Call Stack after all the synchronous code outside the function has run, i.e., GEC has been popped off the stack, for normal execution from the line it got suspended.
+
+- When an async function is suspended at an await statement, the remaining code (after the await) is placed in the microtask queue, and the function temporarily "exits" the call stack.
+
+- Also, an async function ALWAYS RETURNS A PROMISE. If we return a promise explicitly then it will return that promise only but if we return a value it will return us a promise instantly with a fulfilled state and that value will be the resolved value of that promise which was returned automatically by the promise.
+
+### Execution of async function if the order of p3 and p4 is reversed
+
+- Code is self explanatory.
+
+```js
+const p3 = new Promise((res, rej) => {
+  console.log(
+    "Inside executor function, it runs synchronously right at the moment this line runs in the Code Execution Phase!"
+  );
+  setTimeout(() => {
+    res("Promise Resolved after 20 seconds.");
+  }, 20_000);
+  console.log(
+    "setTimeout has been sent to Web APIs and now the timer of 20s has started.\n"
+  );
+});
+
+const p4 = new Promise((res, rej) => {
+  console.log(
+    "Inside executor function, it runs synchronously right at the moment this line runs in the Code Execution Phase!"
+  );
+  setTimeout(() => {
+    res("Promise Resolved after 10 seconds.");
+  }, 10_000);
+  console.log(
+    "setTimeout has been sent to Web APIs and now the timer of 10s has started.\n"
+  );
+});
+
+async function handlePromise2() {
+  console.log("This line will run the moment this function is called.\n");
+
+  const result2 = await p4;
+  console.log(
+    "This line will only run once the result from p4 has been assigned to result2 variable, till then the function is suspended."
+  );
+  console.log("result2:", result2, "\n");
+
+  const result1 = await p3; // here the function execution will be suspended
+  console.log(
+    "This line will only run once the result has been assigned to the resul1 variable, till then the function execution is again suspended."
+  );
+  console.log("result1:", result1, "\n");
+
+  console.log(
+    "This line will run once, all the promise results have been logged but in this case result2 would have been logged after 10s and then after 10s again the result1 was logged. Because in the first 10s only p4 got resolved but p3 needed 10 more seconds to resolve\n"
+  );
+}
+
+handlePromise2();
+
+console.log(
+  "Till handlePromise2() function is suspended this line will run in Call Stack.\n"
+);
+```
+
+#### `.then()`, `.catch()` and `async/await` is used to consume Promises. Promises can only be produced using the Promise constructor.
+#### No new timers are started if an `await` or a `.then()`/`.catch()` is encountered.
