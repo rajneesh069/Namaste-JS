@@ -1268,4 +1268,88 @@ console.log(
 ```
 
 #### `.then()`, `.catch()` and `async/await` is used to consume Promises. Promises can only be produced using the Promise constructor.
+
 #### No new timers are started if an `await` or a `.then()`/`.catch()` is encountered.
+
+## `This` keyword in JS
+
+### This in Global Scope
+
+```js
+console.log(this);
+```
+
+- Is `window`object in browsers, or else it depends on the runtime environemnt like for Node.js it could be different.
+
+### This with functions
+
+1. Inside a function
+
+```js
+function someFn() {
+  console.log(this);
+}
+
+someFn();
+```
+
+- Is `undefined` in strict mode and in `non-strict` mode something known as `this substitution` occurs which replaces the value of `this` with global object if it is `undefined` or `null`.
+
+2. With the function call
+
+```js
+function someFn() {
+  console.log(this);
+}
+
+window.someFn();
+```
+
+- Now, `this` will point to the `window` object, so it does depend on `how the function is called`.
+
+3. Functions in objects
+
+```js
+const obj = {
+  a: 10,
+  x: function () {
+    console.log(this);
+  },
+};
+
+obj.x();
+```
+
+- Represents the object itself same as the previous case.
+
+4. Arrow functions
+
+```js
+const obj = {
+  a: 10,
+  x: () => {
+    console.log(this);
+  },
+};
+
+obj.x();
+```
+
+- Now it gives the global object, because arrow functions don't have their own bindings of `this`, they get it from the `enclosing lexical environment`. In this case the lexical enclosing environment is the global object, hence it is the global object.
+
+5. Nested Functions
+
+```js
+const obj = {
+  a: 10,
+  x: function () {
+    (() => {
+      console.log(this);
+    })();
+  },
+};
+
+obj.x();
+```
+
+- In this case it represents the object itself, because the enclosing lexical environment is the object!
